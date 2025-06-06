@@ -1,41 +1,85 @@
+/* ---- Base ---- */
 body {
+  margin: 0;
+  padding: 0;
   font-family: 'Segoe UI', sans-serif;
   background: linear-gradient(to bottom right, #1e1e2f, #2e2e4f);
   color: #f5f5f5;
   text-align: center;
-  padding: 1rem;
-  margin: 0;
 }
 
+/* ---- Header ---- */
 h1 {
+  margin-top: 1rem;
+  font-size: 2rem;
   color: #ffcc00;
-  margin-bottom: 1rem;
 }
 
-label {
-  display: block;
-  margin: 0.5rem 0;
-  font-size: 1rem;
+/* ---- Settings ---- */
+.settings {
+  margin: 1rem auto;
+  max-width: 700px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
 }
 
-input, select {
+.settings label {
+  flex: 1 1 200px;
+  background-color: #333;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+/* ---- Form Elements ---- */
+input[type="text"],
+input[type="file"],
+select,
+textarea {
   padding: 0.5rem;
   border-radius: 5px;
   border: none;
   font-size: 1rem;
-  margin: 0.2rem;
+  margin-top: 0.3rem;
   background-color: #444;
   color: #fff;
+  width: 100%;
+}
+
+/* ---- Video Section ---- */
+.video-area {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+video {
+  width: 45%;
+  max-width: 400px;
+  border-radius: 12px;
+  border: 3px solid #555;
+  background: #000;
+}
+
+/* ---- Controls ---- */
+.controls {
+  margin: 1rem auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
 }
 
 button {
-  margin: 0.5rem 0.3rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  border: none;
-  border-radius: 8px;
   background-color: #ffcc00;
   color: #1e1e1e;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -44,21 +88,37 @@ button:hover {
   background-color: #ffaa00;
 }
 
-video {
-  width: 45%;
-  max-width: 400px;
-  margin: 0.5rem;
-  border: 3px solid #555;
-  border-radius: 10px;
-  background-color: black;
+/* ---- Chat ---- */
+.chat-section {
+  margin: 1rem auto;
+  max-width: 600px;
 }
 
-canvas {
-  margin-top: 1rem;
-  max-width: 90%;
-  border-radius: 10px;
+#chatArea {
+  width: 100%;
+  height: 150px;
+  resize: none;
+  margin-bottom: 0.5rem;
+  background-color: #222;
+  border: 1px solid #444;
+  color: #f5f5f5;
+  padding: 0.5rem;
+  border-radius: 8px;
 }
 
+#chatInput {
+  width: calc(100% - 60px);
+  display: inline-block;
+}
+
+#sendBtn,
+#emojiBtn {
+  display: inline-block;
+  padding: 0.5rem;
+  margin-left: 4px;
+}
+
+/* ---- Download Link ---- */
 #downloadLink {
   display: inline-block;
   margin-top: 1rem;
@@ -73,14 +133,28 @@ canvas {
   background-color: #0077cc;
 }
 
-/* Responsive */
+/* ---- Responsive ---- */
 @media screen and (max-width: 768px) {
   video {
     width: 90%;
   }
 
-  input, select, button {
+  .settings,
+  .controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .settings label {
     width: 90%;
-    margin: 0.3rem auto;
+  }
+
+  input[type="text"],
+  select {
+    width: 100%;
+  }
+
+  #chatInput {
+    width: 80%;
   }
 }
