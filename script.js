@@ -3,6 +3,7 @@ let remoteVideo = document.getElementById('remoteVideo');
 let pseudoInput = document.getElementById('pseudo');
 let countrySelect = document.getElementById('country');
 let nextBtn = document.getElementById('nextBtn');
+let stopBtn = document.getElementById('stopBtn');
 let imgInput = document.getElementById('imgInput');
 let canvas = document.getElementById('imageOverlay');
 let ctx = canvas.getContext('2d');
@@ -143,6 +144,22 @@ document.getElementById('startBtn').onclick = () => {
 };
 
 nextBtn.onclick = () => location.reload();
+
+stopBtn.onclick = () => {
+  if (pc) {
+    pc.getSenders().forEach(sender => pc.removeTrack(sender));
+    pc.close();
+    pc = null;
+  }
+  if (localStream) {
+    localStream.getTracks().forEach(track => track.stop());
+    localStream = null;
+  }
+  localVideo.srcObject = null;
+  remoteVideo.srcObject = null;
+  peerId = null;
+  console.log("Connexion arrêtée.");
+};
 
 function findRandomPeer() {
   const selfId = clientId;
