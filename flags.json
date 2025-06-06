@@ -1,10 +1,12 @@
 [
-  {"code": "US", "name": "🇺🇸 United States"},
-  {"code": "FR", "name": "🇫🇷 France"},
-  {"code": "CA", "name": "🇨🇦 Canada"},
-  {"code": "DE", "name": "🇩🇪 Germany"},
-  {"code": "JP", "name": "🇯🇵 Japan"},
-  {"code": "BR", "name": "🇧🇷 Brazil"},
-  {"code": "NG", "name": "🇳🇬 Nigeria"},
-  {"code": "IN", "name": "🇮🇳 India"}
+  {"code": "FR", "name": "France", "emoji": "🇫🇷"},
+  {"code": "US", "name": "États-Unis", "emoji": "🇺🇸"},
+  {"code": "CA", "name": "Canada", "emoji": "🇨🇦"},
+  {"code": "GB", "name": "Royaume-Uni", "emoji": "🇬🇧"},
+  {"code": "DE", "name": "Allemagne", "emoji": "🇩🇪"},
+  {"code": "JP", "name": "Japon", "emoji": "🇯🇵"},
+  {"code": "BR", "name": "Brésil", "emoji": "🇧🇷"},
+  {"code": "IN", "name": "Inde", "emoji": "🇮🇳"},
+  {"code": "RU", "name": "Russie", "emoji": "🇷🇺"},
+  {"code": "CN", "name": "Chine", "emoji": "🇨🇳"}
 ]
