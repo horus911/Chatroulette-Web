@@ -1,31 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mini Chatroulette</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mini Chatroulette</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="container">
-    <header>
-      <h1>Mini Chatroulette</h1>
-      <div id="user-settings">
-        <input type="text" id="pseudo" placeholder="Your nickname" />
-        <select id="country"></select>
-        <button id="startBtn">Start</button>
-        <button id="nextBtn">Suivant</button>
-      </div>
-    </header>
-    <main>
-      <video id="localVideo" autoplay muted playsinline></video>
-      <video id="remoteVideo" autoplay playsinline></video>
-      <canvas id="imageOverlay"></canvas>
-      <input type="file" id="imgInput" accept="image/*" />
-      <button id="recordBtn">🎙️ Start Recording</button>
-      <a id="downloadLink" style="display:none">Télécharger l'audio</a>
-    </main>
-  </div>
+  <h1>Mini Chatroulette</h1>
+
+  <label>Pseudo : <input id="pseudo" type="text" placeholder="Ton pseudo" /></label><br/>
+
+  <label>Pays :
+    <select id="country">
+      <option value="">Choisis ton pays</option>
+    </select>
+  </label><br/>
+
+  <video id="localVideo" autoplay muted playsinline></video>
+  <video id="remoteVideo" autoplay playsinline></video>
+
+  <canvas id="imageOverlay" style="display:block; border:1px solid #ccc;"></canvas>
+
+  <input type="file" id="imgInput" accept="image/*" /><br/>
+
+  <button id="startBtn">Commencer</button>
+  <button id="nextBtn">Suivant</button>
+  <button id="stopBtn">Stop</button>
+  <button id="recordBtn">Enregistrer audio (10s)</button><br/>
+
+  <a id="downloadLink" style="display:none;" href="#" download> Télécharger l'audio </a>
+
   <script src="script.js"></script>
 </body>
 </html>
