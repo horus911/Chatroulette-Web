@@ -1,35 +1,79 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Mini Chatroulette</title>
-<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini Chatroulette</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f0f0;
+      color: #222;
+      padding: 10px;
+      text-align: center;
+    }
+    video {
+      width: 45%;
+      max-height: 200px;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      margin-top: 5px;
+    }
+    .btns button, select {
+      margin: 3px;
+      padding: 7px 12px;
+      font-size: 14px;
+    }
+    .dark {
+      background: #111;
+      color: #eee;
+    }
+    .dark video {
+      border-color: #555;
+    }
+  </style>
 </head>
 <body>
-  <h1>Mini Chatroulette</h1>
+  <h2>🎥 Mini Chatroulette</h2>
 
-  <label>Pseudo : <input id="pseudo" type="text" placeholder="Ton pseudo" /></label><br/>
+  <div>
+    <video id="localVideo" autoplay muted playsinline></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+  </div>
 
-  <label>Pays :
-    <select id="country">
-      <option value="">Choisis ton pays</option>
-    </select>
-  </label><br/>
+  <div class="btns">
+    <button id="startBtn">Démarrer</button>
+    <button id="nextBtn">Suivant</button>
+    <button id="stopBtn">Stop</button>
+    <button id="muteBtn">Mute</button>
+    <button id="camBtn">Cam Off</button>
+    <button id="flipBtn">Flip Caméra</button>
+  </div>
 
-  <video id="localVideo" autoplay muted playsinline></video>
-  <video id="remoteVideo" autoplay playsinline></video>
+  <div class="btns">
+    <input type="file" id="imgInput" accept="image/*">
+    <button id="emojiBtn">😀</button>
+    <button id="recordBtn">🎙️ Enregistrer audio</button>
+    <a id="downloadLink" style="display:none" target="_blank">Télécharger</a>
+  </div>
 
-  <canvas id="imageOverlay" style="display:block; border:1px solid #ccc;"></canvas>
+  <div class="btns">
+    <button id="themeBtn">🎨 Thème</button>
+    <button id="incognitoBtn">🕵️ Incognito</button>
+    <button id="filterBtn">🌈 Filtre</button>
+  </div>
 
-  <input type="file" id="imgInput" accept="image/*" /><br/>
+  <textarea id="chatArea" readonly placeholder="Messages..."></textarea><br>
+  <input type="text" id="chatInput" placeholder="Tape ton message ici...">
+  <button id="sendBtn">Envoyer</button>
 
-  <button id="startBtn">Commencer</button>
-  <button id="nextBtn">Suivant</button>
-  <button id="stopBtn">Stop</button>
-  <button id="recordBtn">Enregistrer audio (10s)</button><br/>
-
-  <a id="downloadLink" style="display:none;" href="#" download> Télécharger l'audio </a>
+  <div class="btns">
+    🌍 <select id="country"><option>Chargement...</option></select>
+  </div>
 
   <script src="script.js"></script>
 </body>
