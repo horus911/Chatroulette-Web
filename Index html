@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Chatroulette</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="container">
+    <header>
+      <h1>Mini Chatroulette</h1>
+      <div id="user-settings">
+        <input type="text" id="pseudo" placeholder="Your nickname" />
+        <select id="country"></select>
+        <button id="startBtn">Start</button>
+        <button id="nextBtn">Suivant</button>
+      </div>
+    </header>
+    <main>
+      <video id="localVideo" autoplay muted playsinline></video>
+      <video id="remoteVideo" autoplay playsinline></video>
+      <canvas id="imageOverlay"></canvas>
+      <input type="file" id="imgInput" accept="image/*" />
+      <button id="recordBtn">🎙️ Start Recording</button>
+      <a id="downloadLink" style="display:none">Télécharger l'audio</a>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
