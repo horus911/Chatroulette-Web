@@ -9,11 +9,20 @@ let ctx = canvas.getContext('2d');
 let recordBtn = document.getElementById('recordBtn');
 let downloadLink = document.getElementById('downloadLink');
 
-let localStream, remoteStream, pc, dataChannel, recorder, chunks = [];
+let localStream, pc, dataChannel, recorder, chunks = [];
 let socket = new WebSocket("wss://chatroul-production.up.railway.app");
 let clientId = Math.random().toString(36).substring(2, 10);
-
 let peerId = null;
+
+let allPeers = [];
+
+fetch('peers.json')
+  .then(res => res.json())
+  .then(data => {
+    allPeers = data;
+    console.log("Liste des pairs disponibles :", allPeers);
+    findRandomPeer();
+  });
 
 socket.onmessage = async (event) => {
   const data = JSON.parse(event.data);
@@ -51,10 +60,14 @@ function send(msg) {
 }
 
 async function startCall() {
+  if (!peerId || peerId === clientId) {
+    alert("Aucun interlocuteur disponible pour le moment.");
+    return;
+  }
   await createPeer(true);
   const offer = await pc.createOffer();
   await pc.setLocalDescription(offer);
-  send({ type: "offer", offer });
+  send({ type: "offer", offer, to: peerId });
 }
 
 async function createPeer(isCaller) {
@@ -122,12 +135,31 @@ recordBtn.onclick = () => {
     downloadLink.textContent = "Télécharger l'audio";
   };
   recorder.start();
-  setTimeout(() => recorder.stop(), 10000); // 10s
+  setTimeout(() => recorder.stop(), 10000);
 };
 
-document.getElementById('startBtn').onclick = startCall;
+document.getElementById('startBtn').onclick = () => {
+  findRandomPeer();
+};
+
 nextBtn.onclick = () => location.reload();
 
+function findRandomPeer() {
+  const selfId = clientId;
+  const filtered = allPeers.filter(p => p.id !== selfId);
+
+  if (filtered.length === 0) {
+    alert("Aucun autre pair disponible pour le moment.");
+    return;
+  }
+
+  const random = filtered[Math.floor(Math.random() * filtered.length)];
+  peerId = random.id;
+  console.log("Connexion à :", random);
+  startCall();
+}
+
+// Chargement de la liste des pays avec drapeaux
 fetch('flags.json').then(res => res.json()).then(data => {
   data.forEach(c => {
     let opt = document.createElement('option');
@@ -136,4 +168,3 @@ fetch('flags.json').then(res => res.json()).then(data => {
     countrySelect.appendChild(opt);
   });
 });
-  
