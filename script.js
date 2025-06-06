@@ -1,187 +1,186 @@
-let localVideo = document.getElementById('localVideo');
-let remoteVideo = document.getElementById('remoteVideo');
-let pseudoInput = document.getElementById('pseudo');
-let countrySelect = document.getElementById('country');
-let nextBtn = document.getElementById('nextBtn');
-let stopBtn = document.getElementById('stopBtn');
-let imgInput = document.getElementById('imgInput');
-let canvas = document.getElementById('imageOverlay');
-let ctx = canvas.getContext('2d');
-let recordBtn = document.getElementById('recordBtn');
-let downloadLink = document.getElementById('downloadLink');
+// 🎥 Variables WebRTC
+let localStream = null;
+let remoteStream = null;
+let peerConnection = null;
+let isMuted = false;
+let camOn = true;
+let usingFrontCamera = true;
 
-let localStream, pc, dataChannel, recorder, chunks = [];
-let socket = new WebSocket("wss://chatroul-production.up.railway.app");
-let clientId = Math.random().toString(36).substring(2, 10);
-let peerId = null;
+// 🌍 HTML Elements
+const localVideo = document.getElementById("localVideo");
+const remoteVideo = document.getElementById("remoteVideo");
+const startBtn = document.getElementById("startBtn");
+const nextBtn = document.getElementById("nextBtn");
+const stopBtn = document.getElementById("stopBtn");
+const muteBtn = document.getElementById("muteBtn");
+const camBtn = document.getElementById("camBtn");
+const flipBtn = document.getElementById("flipBtn");
+const chatArea = document.getElementById("chatArea");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+const emojiBtn = document.getElementById("emojiBtn");
+const downloadLink = document.getElementById("downloadLink");
 
-let allPeers = [];
+// 🔊 Audio record
+let mediaRecorder, audioChunks = [];
 
-fetch('peers.json')
-  .then(res => res.json())
-  .then(data => {
-    allPeers = data;
-    console.log("Liste des pairs disponibles :", allPeers);
-    findRandomPeer();
-  });
-
-socket.onmessage = async (event) => {
-  const data = JSON.parse(event.data);
-  if (data.to !== clientId) return;
-
-  switch (data.type) {
-    case "offer":
-      await createPeer(false);
-      await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-      send({ type: "answer", answer, to: data.from });
-      peerId = data.from;
-      break;
-
-    case "answer":
-      await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-      break;
-
-    case "ice":
-      if (data.candidate) {
-        try {
-          await pc.addIceCandidate(data.candidate);
-        } catch (e) {
-          console.warn("ICE error:", e);
-        }
-      }
-      break;
-  }
+// 🌐 ICE Servers
+const iceServers = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" }
+  ]
 };
 
-function send(msg) {
-  msg.from = clientId;
-  socket.send(JSON.stringify(msg));
-}
-
+// 🎬 Start call
 async function startCall() {
-  if (!peerId || peerId === clientId) {
-    alert("Aucun interlocuteur disponible pour le moment.");
-    return;
-  }
-  await createPeer(true);
-  const offer = await pc.createOffer();
-  await pc.setLocalDescription(offer);
-  send({ type: "offer", offer, to: peerId });
-}
+  localStream = await navigator.mediaDevices.getUserMedia({
+    audio: true,
+    video: { facingMode: usingFrontCamera ? "user" : "environment" }
+  });
 
-async function createPeer(isCaller) {
-  localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
   localVideo.srcObject = localStream;
 
-  pc = new RTCPeerConnection();
-  pc.onicecandidate = (e) => {
-    if (e.candidate) send({ type: "ice", candidate: e.candidate, to: peerId });
-  };
-  pc.ontrack = (e) => {
-    remoteVideo.srcObject = e.streams[0];
-  };
+  peerConnection = new RTCPeerConnection(iceServers);
 
-  if (isCaller) {
-    dataChannel = pc.createDataChannel("chat");
-    setupDataChannel();
-  } else {
-    pc.ondatachannel = (e) => {
-      dataChannel = e.channel;
-      setupDataChannel();
-    };
-  }
+  localStream.getTracks().forEach(track => {
+    peerConnection.addTrack(track, localStream);
+  });
 
-  localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
-}
-
-function setupDataChannel() {
-  dataChannel.onmessage = ev => {
-    let data = JSON.parse(ev.data);
-    if (data.type === "image") showImage(data.payload);
-  };
-}
-
-function showImage(base64) {
-  let img = new Image();
-  img.onload = () => {
-    canvas.width = img.width;
-    canvas.height = img.height;
-    ctx.drawImage(img, 0, 0);
-  };
-  img.src = base64;
-}
-
-imgInput.onchange = () => {
-  let file = imgInput.files[0];
-  let reader = new FileReader();
-  reader.onload = () => {
-    if (dataChannel?.readyState === "open") {
-      dataChannel.send(JSON.stringify({ type: "image", payload: reader.result }));
+  peerConnection.ontrack = (event) => {
+    if (!remoteStream) {
+      remoteStream = new MediaStream();
+      remoteVideo.srcObject = remoteStream;
     }
+    remoteStream.addTrack(event.track);
   };
-  reader.readAsDataURL(file);
-};
 
-recordBtn.onclick = () => {
-  recorder = new MediaRecorder(localStream);
-  chunks = [];
-  recorder.ondataavailable = e => chunks.push(e.data);
-  recorder.onstop = () => {
-    let blob = new Blob(chunks, { type: 'audio/webm' });
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = 'session_audio.webm';
-    downloadLink.style.display = 'inline';
-    downloadLink.textContent = "Télécharger l'audio";
-  };
-  recorder.start();
-  setTimeout(() => recorder.stop(), 10000);
-};
+  // TODO: WebSocket ou Netlify Function
+  console.log("Appel démarré (Signaling à venir)");
+}
 
-document.getElementById('startBtn').onclick = () => {
-  findRandomPeer();
-};
-
-nextBtn.onclick = () => location.reload();
+// 🔘 Boutons principaux
+startBtn.onclick = () => startCall();
 
 stopBtn.onclick = () => {
-  if (pc) {
-    pc.getSenders().forEach(sender => pc.removeTrack(sender));
-    pc.close();
-    pc = null;
-  }
+  if (peerConnection) peerConnection.close();
   if (localStream) {
-    localStream.getTracks().forEach(track => track.stop());
-    localStream = null;
+    localStream.getTracks().forEach(t => t.stop());
+    localVideo.srcObject = null;
   }
-  localVideo.srcObject = null;
   remoteVideo.srcObject = null;
-  peerId = null;
-  console.log("Connexion arrêtée.");
+  console.log("Appel terminé");
 };
 
-function findRandomPeer() {
-  const selfId = clientId;
-  const filtered = allPeers.filter(p => p.id !== selfId);
+nextBtn.onclick = () => {
+  stopBtn.onclick();
+  startCall(); // Simulé
+};
 
-  if (filtered.length === 0) {
-    alert("Aucun autre pair disponible pour le moment.");
-    return;
-  }
+muteBtn.onclick = () => {
+  isMuted = !isMuted;
+  localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
+  muteBtn.textContent = isMuted ? "Unmute" : "Mute";
+};
 
-  const random = filtered[Math.floor(Math.random() * filtered.length)];
-  peerId = random.id;
-  console.log("Connexion à :", random);
-  startCall();
+camBtn.onclick = () => {
+  camOn = !camOn;
+  localStream.getVideoTracks().forEach(track => track.enabled = camOn);
+  camBtn.textContent = camOn ? "Cam On" : "Cam Off";
+};
+
+flipBtn.onclick = async () => {
+  usingFrontCamera = !usingFrontCamera;
+  localStream.getTracks().forEach(t => t.stop());
+  await startCall();
+};
+
+// 💬 Chat texte
+sendBtn.onclick = sendMessage;
+chatInput.onkeypress = (e) => {
+  if (e.key === "Enter") sendMessage();
+};
+
+function sendMessage() {
+  const msg = chatInput.value.trim();
+  if (!msg) return;
+  chatArea.value += `Moi: ${msg}\n`;
+  chatInput.value = "";
+  // TODO: envoyer par dataChannel
 }
 
-// Chargement de la liste des pays avec drapeaux
-fetch('flags.json').then(res => res.json()).then(data => {
-  data.forEach(c => {
-    let opt = document.createElement('option');
-    opt.value = c.code;
-    opt.textContent = c.name;
-    countrySelect.appendChild(opt);
-  });
+// 😀 Emoji
+emojiBtn.onclick = () => {
+  chatInput.value += "😊";
+  chatInput.focus();
+};
+
+// 🖼️ Envoi image
+document.getElementById("imgInput").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const img = new Image();
+    img.src = reader.result;
+    img.style.maxWidth = "100px";
+    chatArea.value += "📷 Image envoyée\n";
+    chatArea.scrollTop = chatArea.scrollHeight;
+  };
+  reader.readAsDataURL(file);
 });
+
+// 🎙️ Audio record
+document.getElementById("recordBtn").onclick = () => {
+  if (!localStream) return alert("Démarre un appel.");
+  if (!mediaRecorder || mediaRecorder.state === "inactive") {
+    audioChunks = [];
+    mediaRecorder = new MediaRecorder(localStream);
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunks, { type: "audio/webm" });
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = "enregistrement.webm";
+      downloadLink.style.display = "inline-block";
+      downloadLink.textContent = "🎧 Télécharger audio";
+    };
+    mediaRecorder.start();
+    document.getElementById("recordBtn").textContent = "⏹️ Stop rec";
+  } else {
+    mediaRecorder.stop();
+    document.getElementById("recordBtn").textContent = "🎙️ Enregistrer audio";
+  }
+};
+
+// 🎨 Changer thème
+document.getElementById("themeBtn").onclick = () => {
+  document.body.classList.toggle("dark");
+};
+
+// 🕵️ Incognito
+document.getElementById("incognitoBtn").onclick = () => {
+  const f = "blur(10px)";
+  localVideo.style.filter = localVideo.style.filter ? "" : f;
+  remoteVideo.style.filter = remoteVideo.style.filter ? "" : f;
+};
+
+// 🌈 Filtres vidéo
+const filters = ["grayscale(1)", "sepia(1)", "invert(1)", "none"];
+let filterIndex = 0;
+
+document.getElementById("filterBtn").onclick = () => {
+  filterIndex = (filterIndex + 1) % filters.length;
+  remoteVideo.style.filter = filters[filterIndex];
+};
+
+// 🌍 Pays
+fetch("flags.json")
+  .then(res => res.json())
+  .then(flags => {
+    const select = document.getElementById("country");
+    flags.forEach(flag => {
+      const opt = document.createElement("option");
+      opt.value = flag.code;
+      opt.textContent = `${flag.emoji} ${flag.name}`;
+      select.appendChild(opt);
+    });
+  });
